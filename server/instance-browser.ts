@@ -15,7 +15,7 @@ export interface InstanceBrowserContext {
 
 /** Launch a URL in the browser profile owned by one instance. */
 export function launchUrlInInstanceBrowser(rawUrl: string, context: InstanceBrowserContext) {
-  if (!rawUrl || rawUrl.length > MAX_URL_LENGTH) throw new Error('URL 为空或过长')
+  if (!rawUrl || rawUrl.trim().length === 0 || rawUrl.length > MAX_URL_LENGTH) throw new Error('URL 为空或过长')
   const url = new URL(rawUrl)
   if (!['http:', 'https:'].includes(url.protocol)) throw new Error('只允许打开 http/https 链接')
   if (url.username || url.password) throw new Error('URL 不允许携带账号或密码')

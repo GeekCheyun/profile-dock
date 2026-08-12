@@ -24,6 +24,13 @@ test('browser rejects an empty URL before resolving an executable', () => {
   )
 })
 
+test('browser rejects whitespace-only URLs before parsing', () => {
+  assert.throws(
+    () => launchUrlInInstanceBrowser(' \t\r\n ', { appPath: '', workDir: path.join(process.cwd(), 'engine', 'instances', 'p1', '1') }),
+    /URL 为空或过长/,
+  )
+})
+
 test('实例浏览器拒绝非受管工作目录，避免回退到宿主 Profile', () => {
   assert.throws(
     () => launchUrlInInstanceBrowser('https://example.test/', { appPath: 'C:\\Program Files\\Chrome\\chrome.exe', workDir: path.resolve('outside-instance') }),
