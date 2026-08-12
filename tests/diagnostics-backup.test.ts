@@ -6,6 +6,27 @@ import { test } from 'node:test'
 import { createDiagnosticReport } from '../server/diagnostics.js'
 import { backupInstance, restoreInstanceBackup } from '../server/backup.js'
 
+test('backup restore rejects a manifest for a different instance', () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'multiopen-backup-mismatch-'))
+  try {
+    const backup = path.join(dir, 'backup')
+    mkdirSync(path.join(backup, 'instance'), { recursive: true })
+    writeFileSync(path.join(backup, 'backup-manifest.json'), JSON.stringify({
+      schemaVersion: 1,
+      backupId: 'profile-1-1-test',
+      profileId: 'profile-1',
+      index: 1,
+    }), 'utf8')
+    assert.throws(
+      () => restoreInstanceBackup(backup, 'profile-2', 1, path.join(dir, 'instances')),
+      /备份与目标实例不匹配/,
+    )
+  } finally {
+    assert.ok(dir.startsWith(os.tmpdir()))
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
 test('诊断报告只输出受管相对路径和明确限制', () => {
   const report = createDiagnosticReport({
     profileId: 'profile-1', index: 1, box: 'App-1',
