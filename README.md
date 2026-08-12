@@ -139,6 +139,8 @@ npm run smoke:auth-fail-closed
 
 WorkBuddy's in-app external-link path calls Electron `shell.openExternal` directly. Windows resolves that call through the host user's default-browser association, so an instance cannot be assigned a different browser profile through environment variables or `--user-data-dir` alone. The launcher no longer advertises `MULTIOPEN_BROWSER_*` as if it intercepted that call.
 
+The explicit Browser Broker accepts only `http:` and `https:` URLs. It rejects empty or whitespace-only input, URLs containing credentials, and URLs over 16 KiB before resolving a browser executable. Rejected input does not create or modify an instance browser profile.
+
 Normal launches do not enable native process hooks. The explicit Browser Broker action opens the
 instance's `browser-profile-v2`; the optional browser-only hook requires
 `MULTIOPEN_ENABLE_BROWSER_HOOKS=1` and is diagnostic-only. Device identity, hardware identity,
