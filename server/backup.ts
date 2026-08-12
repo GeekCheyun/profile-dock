@@ -59,7 +59,12 @@ export function restoreInstanceBackup(backupDir: string, profileId: string, inde
   const manifestFile = path.join(backup, 'backup-manifest.json')
   const source = path.join(backup, 'instance')
   if (!existsSync(manifestFile) || !existsSync(source)) throw new Error('备份目录不完整')
-  const manifest = JSON.parse(readFileSync(manifestFile, 'utf8')) as BackupManifest
+  let manifest: BackupManifest
+  try {
+    manifest = JSON.parse(readFileSync(manifestFile, 'utf8')) as BackupManifest
+  } catch {
+    throw new Error('备份目录不完整')
+  }
   if (manifest.schemaVersion !== 1 || manifest.profileId !== profileId || manifest.index !== index) throw new Error('备份与目标实例不匹配')
   const target = sourceInstanceRoot(profileId, index, instancesRoot)
   if (existsSync(target)) throw new Error('目标实例目录已存在，恢复操作拒绝覆盖')

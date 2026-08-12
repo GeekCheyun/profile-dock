@@ -6,6 +6,22 @@ import { test } from 'node:test'
 import { createDiagnosticReport } from '../server/diagnostics.js'
 import { backupInstance, restoreInstanceBackup } from '../server/backup.js'
 
+test('backup restore rejects a malformed manifest as an incomplete backup', () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'multiopen-backup-malformed-'))
+  try {
+    const backup = path.join(dir, 'backup')
+    mkdirSync(path.join(backup, 'instance'), { recursive: true })
+    writeFileSync(path.join(backup, 'backup-manifest.json'), '{not-json', 'utf8')
+    assert.throws(
+      () => restoreInstanceBackup(backup, 'profile-1', 1, path.join(dir, 'instances')),
+      /备份目录不完整/,
+    )
+  } finally {
+    assert.ok(dir.startsWith(os.tmpdir()))
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
 test('backup restore refuses to overwrite an existing instance', () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'multiopen-backup-existing-'))
   try {
