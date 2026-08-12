@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import net from 'node:net'
+import http from 'node:http'
 import os from 'node:os'
 import path from 'node:path'
 import { spawn } from 'node:child_process'
@@ -15,6 +16,17 @@ function reservePort(): Promise<number> {
       const port = typeof address === 'object' && address ? address.port : 0
       server.close(() => resolve(port))
     })
+  })
+}
+
+function requestWithHost(port: number, host: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const request = http.request({ hostname: '127.0.0.1', port, path: '/api/health', headers: { Host: host } }, (response) => {
+      response.resume()
+      response.once('end', () => resolve(response.statusCode || 0))
+    })
+    request.once('error', reject)
+    request.end()
   })
 }
 
@@ -69,6 +81,8 @@ test('production control API is loopback-bound, origin-checked and does not reve
       headers: { Origin: 'https://attacker.invalid' },
     })
     assert.equal(untrustedOrigin.status, 403)
+
+    assert.equal(await requestWithHost(port, `attacker.invalid:${port}`), 421)
 
     const authorized = await fetch(`http://127.0.0.1:${port}/api/profiles`, {
       headers: { Authorization: `Bearer ${token}` },
