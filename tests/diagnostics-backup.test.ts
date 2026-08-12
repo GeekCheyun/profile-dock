@@ -6,6 +6,22 @@ import { test } from 'node:test'
 import { createDiagnosticReport } from '../server/diagnostics.js'
 import { backupInstance, restoreInstanceBackup } from '../server/backup.js'
 
+test('backup restore rejects a null manifest without leaking a TypeError', () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'multiopen-backup-null-'))
+  try {
+    const backup = path.join(dir, 'backup')
+    mkdirSync(path.join(backup, 'instance'), { recursive: true })
+    writeFileSync(path.join(backup, 'backup-manifest.json'), 'null', 'utf8')
+    assert.throws(
+      () => restoreInstanceBackup(backup, 'profile-1', 1, path.join(dir, 'instances')),
+      /备份与目标实例不匹配/,
+    )
+  } finally {
+    assert.ok(dir.startsWith(os.tmpdir()))
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
 test('backup restore rejects a malformed manifest as an incomplete backup', () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'multiopen-backup-malformed-'))
   try {
