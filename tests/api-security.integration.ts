@@ -60,6 +60,11 @@ test('production control API is loopback-bound, origin-checked and does not reve
     const unauthenticated = await fetch(`http://127.0.0.1:${port}/api/profiles`)
     assert.equal(unauthenticated.status, 401)
 
+    const bareToken = await fetch(`http://127.0.0.1:${port}/api/profiles`, {
+      headers: { Authorization: token },
+    })
+    assert.equal(bareToken.status, 401)
+
     const untrustedOrigin = await fetch(`http://127.0.0.1:${port}/api/health`, {
       headers: { Origin: 'https://attacker.invalid' },
     })

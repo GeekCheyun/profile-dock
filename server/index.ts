@@ -71,7 +71,8 @@ app.use('/api', (req, res, next) => {
   // 健康检查和 token 获取不需要认证
   if (req.path === '/health') return next()
   if (req.path === '/token' && !process.env.ELECTRON_DESKTOP) return next()
-  const token = req.headers['authorization']?.replace('Bearer ', '') || ''
+  const authorization = String(req.headers['authorization'] || '')
+  const token = authorization.match(/^Bearer\s+(.+)$/i)?.[1] || ''
   if (token !== API_TOKEN) {
     return res.status(401).json({ ok: false, error: '未授权' })
   }
