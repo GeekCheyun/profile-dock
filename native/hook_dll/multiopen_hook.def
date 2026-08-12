@@ -1,0 +1,3 @@
+LIBRARY multiopen_hook
+EXPORTS
+    ; DLL 无需显式导出（通过 DllMain 自动初始化）

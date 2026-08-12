@@ -1,0 +1,56 @@
+node_modules
+dist
+data/config.json
+*.log
+.vscode
+
+# Logs
+logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+dev-debug.log
+# Dependency directories
+node_modules/
+# Environment variables
+.env
+# Editor directories and files
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+# OS specific
+.DS_Store
+
+# Task files
+# tasks.json
+# tasks/ 
+
+# Local runtime and user data
+engine/instances/
+engine/tools_shared/
+data/
+dist/
+dist-server/
+release/
+*.deleting-*
+
+# Native build intermediates and installers
+*.obj
+*.lib
+*.exp
+sandboxie-*.exe
+native/build/*.dll.bak
+
+# Internal agent/project state; do not publish
+.project-knowledge/
+.taskmaster/
+.workbuddy/
+AGENTS.md
+AUTHORIZATION_REFACTOR_HANDOFF.md
+
+# Local build/debug scratch files
+native/tmp/
+native/minhook_tmp/

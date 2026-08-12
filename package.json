@@ -1,0 +1,89 @@
+{
+  "name": "multi-open-tool",
+  "version": "1.0.0",
+  "private": false,
+  "description": "应用多开工具 —— 每实例独立持久化 Profile 与可审计授权浏览器代理",
+  "author": "WorkBuddy",
+  "license": "MIT",
+  "type": "module",
+  "main": "electron/main.mjs",
+  "scripts": {
+    "build:server": "tsc -p tsconfig.server.json",
+    "build": "npm run build:server && vite build",
+    "start": "cross-env NODE_ENV=production tsx server/index.ts",
+    "dev": "concurrently -k -n server,web -c blue,green \"tsx watch server/index.ts\" \"vite\"",
+    "test": "tsx --test tests/*.test.ts",
+    "test:api": "tsx --test tests/api-security.integration.ts",
+    "test:browser": "tsx --test tests/browser-loopback.integration.ts",
+    "test:browser-isolation": "tsx --test tests/browser-profile-isolation.integration.ts",
+    "smoke:electron": "node scripts/electron-smoke.mjs",
+    "smoke:trae-start": "cross-env MULTIOPEN_SMOKE_RESTART_TRAE=1 node scripts/electron-smoke.mjs",
+    "smoke:trae-add": "cross-env MULTIOPEN_SMOKE_ADD_TRAE=1 node scripts/electron-smoke.mjs",
+    "smoke:auth-fail-closed": "cross-env MULTIOPEN_SMOKE_AUTH_FAIL_CLOSED=1 node scripts/electron-smoke.mjs",
+    "smoke:trae-stop": "cross-env MULTIOPEN_SMOKE_STOP_TRAE=1 node scripts/electron-smoke.mjs",
+    "release:check": "npm run build && node scripts/release-check.mjs",
+    "release:manifest": "npm run build && node scripts/release-check.mjs && node scripts/release-manifest.mjs",
+    "release:portable": "npm run build && node scripts/create-portable-candidate.mjs",
+    "security:check": "node scripts/security-check.mjs",
+    "security:sbom": "node scripts/generate-sbom.mjs",
+    "test:isolation": "tsx --test tests/multi-instance-isolation.test.ts tests/license.test.ts",
+    "test:soak": "tsx scripts/instance-soak.ts --iterations=100",
+    "electron": "electron .",
+    "electron:dev": "npm run build:server && concurrently -k -n web,app -c green,blue \"vite\" \"cross-env VITE_DEV_SERVER_URL=http://127.0.0.1:5173 electron .\"",
+    "dist": "npm run build && electron-builder"
+  },
+  "dependencies": {
+    "@types/ws": "^8.18.1",
+    "express": "^4.19.2",
+    "koffi": "^3.1.4",
+    "ws": "^8.21.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.19",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^43.3.0",
+    "electron-builder": "^24.13.3",
+    "postcss": "^8.4.39",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^3.4.6",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.3",
+    "vite": "^5.3.4"
+  },
+  "build": {
+    "appId": "com.workbuddy.multiopen",
+    "productName": "应用多开工具",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-server/**/*",
+      "electron/**/*",
+      "server/pick.ps1",
+      "native/build/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "server/pick.ps1",
+      "native/build/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    }
+  }
+}
