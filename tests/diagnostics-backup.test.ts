@@ -6,6 +6,30 @@ import { test } from 'node:test'
 import { createDiagnosticReport } from '../server/diagnostics.js'
 import { backupInstance, restoreInstanceBackup } from '../server/backup.js'
 
+test('backup restore refuses to overwrite an existing instance', () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), 'multiopen-backup-existing-'))
+  try {
+    const instancesRoot = path.join(dir, 'instances')
+    const target = path.join(instancesRoot, 'profile-1', '1')
+    const backup = path.join(dir, 'backup')
+    mkdirSync(target, { recursive: true })
+    mkdirSync(path.join(backup, 'instance'), { recursive: true })
+    writeFileSync(path.join(backup, 'backup-manifest.json'), JSON.stringify({
+      schemaVersion: 1,
+      backupId: 'profile-1-1-test',
+      profileId: 'profile-1',
+      index: 1,
+    }), 'utf8')
+    assert.throws(
+      () => restoreInstanceBackup(backup, 'profile-1', 1, instancesRoot),
+      /目标实例目录已存在，恢复操作拒绝覆盖/,
+    )
+  } finally {
+    assert.ok(dir.startsWith(os.tmpdir()))
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
 test('backup restore rejects a manifest for a different instance', () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), 'multiopen-backup-mismatch-'))
   try {
