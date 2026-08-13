@@ -101,6 +101,11 @@ test('production control API is loopback-bound, origin-checked and does not reve
     })
     assert.equal(missingProfileInstances.status, 404)
 
+    const missingInstanceDiagnostics = await fetch(`http://127.0.0.1:${port}/api/instances/missing/diagnostics`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    assert.equal(missingInstanceDiagnostics.status, 404)
+
     const license = await fetch(`http://127.0.0.1:${port}/api/license/status`, {
       headers: { Authorization: `Bearer ${token}` },
     })
