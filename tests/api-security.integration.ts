@@ -88,6 +88,7 @@ test('production control API is loopback-bound, origin-checked and does not reve
       headers: { Authorization: `Bearer ${token}` },
     })
     assert.equal(authorized.status, 200)
+    assert.equal(authorized.headers.get('cache-control'), 'no-store')
 
     const license = await fetch(`http://127.0.0.1:${port}/api/license/status`, {
       headers: { Authorization: `Bearer ${token}` },
