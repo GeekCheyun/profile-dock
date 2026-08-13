@@ -111,6 +111,12 @@ test('production control API is loopback-bound, origin-checked and does not reve
     })
     assert.equal(missingInstanceReceipts.status, 404)
 
+    const missingInstanceBrowser = await fetch(`http://127.0.0.1:${port}/api/instances/missing/browser`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    assert.equal(missingInstanceBrowser.status, 404)
+
     const license = await fetch(`http://127.0.0.1:${port}/api/license/status`, {
       headers: { Authorization: `Bearer ${token}` },
     })
