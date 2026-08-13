@@ -135,6 +135,12 @@ test('production control API is loopback-bound, origin-checked and does not reve
     })
     assert.equal(disabledProxyAllocate.status, 410)
 
+    const disabledFingerprintRegeneration = await fetch(`http://127.0.0.1:${port}/api/instances/missing/regenerate-fingerprint`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    assert.equal(disabledFingerprintRegeneration.status, 410)
+
     const license = await fetch(`http://127.0.0.1:${port}/api/license/status`, {
       headers: { Authorization: `Bearer ${token}` },
     })
