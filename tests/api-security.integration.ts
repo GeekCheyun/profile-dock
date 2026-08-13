@@ -123,6 +123,18 @@ test('production control API is loopback-bound, origin-checked and does not reve
     })
     assert.equal(missingInstanceAuthorization.status, 404)
 
+    const disabledProxyFetch = await fetch(`http://127.0.0.1:${port}/api/proxy-pool/fetch`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    assert.equal(disabledProxyFetch.status, 410)
+
+    const disabledProxyAllocate = await fetch(`http://127.0.0.1:${port}/api/proxy-pool/allocate`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    assert.equal(disabledProxyAllocate.status, 410)
+
     const license = await fetch(`http://127.0.0.1:${port}/api/license/status`, {
       headers: { Authorization: `Bearer ${token}` },
     })
